@@ -4,7 +4,7 @@
 
 Name:           python-%{srcname}
 Version:        0.6.1
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        Pip installs packages.  Python packages.  An easy_install replacement
 
 Group:          Development/Libraries
@@ -47,5 +47,10 @@ pip is meant to improve on easy_install.bulletin boards, etc.).
 %{python_sitelib}/pip*
 
 %changelog
+* Tue Dec 18 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-2
+- fix spec file 
+* Mon Dec 17 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-1
+- upgrade to 0.6.1 of pip
 * Mon Aug 31 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.4-1
 - Initial package
+
