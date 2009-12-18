@@ -3,7 +3,7 @@
 %global srcname pip
 
 Name:           python-%{srcname}
-Version:        0.4
+Version:        0.6.1
 Release:        1%{?dist}
 Summary:        Pip installs packages.  Python packages.  An easy_install replacement
 
