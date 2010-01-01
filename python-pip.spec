@@ -4,7 +4,7 @@
 
 Name:           python-%{srcname}
 Version:        0.6.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Pip installs packages.  Python packages.  An easy_install replacement
 
 Group:          Development/Libraries
@@ -16,6 +16,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools-devel
+Requires:	python-setuptools
 
 %description
 
@@ -47,6 +48,8 @@ pip is meant to improve on easy_install.bulletin boards, etc.).
 %{python_sitelib}/pip*
 
 %changelog
+* Fri Jan 1 2010 Peter Halliday <phalliday@excelsiorssytems.net> - 0.6.1.4
+- fix dependency issue
 * Tue Dec 18 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-2
 - fix spec file 
 * Mon Dec 17 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-1
