@@ -3,7 +3,7 @@
 %global srcname pip
 
 Name:           python-%{srcname}
-Version:        0.7.1
+Version:        0.7.2
 Release:        4%{?dist}
 Summary:        Pip installs packages.  Python packages.  An easy_install replacement
 
@@ -48,8 +48,10 @@ pip is meant to improve on easy_install.bulletin boards, etc.).
 %{python_sitelib}/pip*
 
 %changelog
+* Wed Jul 7 2010 Peter Halliday <phalliday@excelsiorsystems.net> - 0.7.2-1
+- update to 0.7.2 of pip
 * Sun May 23 2010 Peter Halliday <phalliday@excelsiorsystems.net> - 0.7.1-1
-- update to 0.7.1. of pip
+- update to 0.7.1 of pip
 * Fri Jan 1 2010 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1.4
 - fix dependency issue
 * Tue Dec 18 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-2
