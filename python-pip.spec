@@ -4,7 +4,7 @@
 
 Name:           python-%{srcname}
 Version:        0.7.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Pip installs packages.  Python packages.  An easy_install replacement
 
 Group:          Development/Libraries
@@ -48,6 +48,9 @@ pip is meant to improve on easy_install.bulletin boards, etc.).
 %{python_sitelib}/pip*
 
 %changelog
+* Thu Jul 22 2010 David Malcolm <dmalcolm@redhat.com> - 0.7.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
+
 * Wed Jul 7 2010 Peter Halliday <phalliday@excelsiorsystems.net> - 0.7.2-1
 - update to 0.7.2 of pip
 * Sun May 23 2010 Peter Halliday <phalliday@excelsiorsystems.net> - 0.7.1-1
