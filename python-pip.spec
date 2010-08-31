@@ -3,8 +3,8 @@
 %global srcname pip
 
 Name:           python-%{srcname}
-Version:        0.7.2
-Release:        5%{?dist}
+Version:        0.8
+Release:        1%{?dist}
 Summary:        Pip installs packages.  Python packages.  An easy_install replacement
 
 Group:          Development/Libraries
@@ -37,6 +37,8 @@ pip is meant to improve on easy_install.bulletin boards, etc.).
 %install
 %{__rm} -rf %{buildroot}
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
+%{__rm} -rf %{buildroot}%{_bindir}/pip-*
+mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/pip-python
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -44,10 +46,12 @@ pip is meant to improve on easy_install.bulletin boards, etc.).
 %files
 %defattr(-,root,root,-)
 %doc PKG-INFO docs
-%attr(755,root,root) %{_bindir}/pip
+%attr(755,root,root) %{_bindir}/pip-python
 %{python_sitelib}/pip*
 
 %changelog
+* Mon Aug 30 2010 Peter Halliday <phalliday@excelsiorsystems.net> - 0.8-1
+- update to 0.8 of pip
 * Thu Jul 22 2010 David Malcolm <dmalcolm@redhat.com> - 0.7.2-5
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 
