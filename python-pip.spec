@@ -3,7 +3,7 @@
 %global srcname pip
 
 Name:           python-%{srcname}
-Version:        0.8
+Version:        0.8.2
 Release:        1%{?dist}
 Summary:        Pip installs packages.  Python packages.  An easy_install replacement
 
@@ -50,6 +50,8 @@ mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/pip-python
 %{python_sitelib}/pip*
 
 %changelog
+* Mon Dec 20 2010 Luke Macken <lmacken@redhat.com> - 0.8.2-1
+- update to 0.8.2 of pip
 * Mon Aug 30 2010 Peter Halliday <phalliday@excelsiorsystems.net> - 0.8-1
 - update to 0.8 of pip
 * Thu Jul 22 2010 David Malcolm <dmalcolm@redhat.com> - 0.7.2-5
