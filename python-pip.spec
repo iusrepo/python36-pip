@@ -3,13 +3,13 @@
 %global srcname pip
 
 Name:           python-%{srcname}
-Version:        0.8.2
-Release:        2%{?dist}
+Version:        0.8.3
+Release:        1%{?dist}
 Summary:        Pip installs packages.  Python packages.  An easy_install replacement
 
 Group:          Development/Libraries
 License:        MIT
-URL:            http://pip.openplans.org
+URL:            http://www.pip-installer.org
 Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -38,18 +38,23 @@ pip is meant to improve on easy_install.bulletin boards, etc.).
 %{__rm} -rf %{buildroot}
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
 %{__rm} -rf %{buildroot}%{_bindir}/pip-*
+
+# Change the name of the pip executable in order to not conflict with perl-pip
+# https://bugzilla.redhat.com/show_bug.cgi?id=616399
 mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/pip-python
 
 %clean
 %{__rm} -rf %{buildroot}
 
 %files
-%defattr(-,root,root,-)
 %doc PKG-INFO docs
 %attr(755,root,root) %{_bindir}/pip-python
 %{python_sitelib}/pip*
 
 %changelog
+* Wed Jun 22 2011 Tim Flink <tflink@fedoraproject.org> - 0.8.3-1
+- update to 0.8.3 and project home page
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.8.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
