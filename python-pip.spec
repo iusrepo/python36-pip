@@ -9,7 +9,7 @@
 
 Name:           python-%{srcname}
 Version:        1.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Pip installs packages.  Python3 packages.  An easy_install replacement
 
 Group:          Development/Libraries
@@ -113,6 +113,9 @@ mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/pip-python
 %endif # with_python3
 
 %changelog
+* Sat Aug 04 2012 David Malcolm <dmalcolm@redhat.com> - 1.1-3
+- rebuild for https://fedoraproject.org/wiki/Features/Python_3.3
+
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
