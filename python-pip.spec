@@ -8,8 +8,8 @@
 %global srcname pip
 
 Name:           python-%{srcname}
-Version:        1.1
-Release:        3%{?dist}
+Version:        1.2.1
+Release:        1%{?dist}
 Summary:        Pip installs packages.  Python3 packages.  An easy_install replacement
 
 Group:          Development/Libraries
@@ -72,7 +72,14 @@ pushd %{py3dir}
 
 # Change the name of the pip executable in order to not conflict with perl-pip
 # https://bugzilla.redhat.com/show_bug.cgi?id=616399
-mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/pip-python3
+mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/python3-pip
+
+# after changing the pip-python binary name, make a symlink to the old name,
+# that will be removed in a later version
+# https://bugzilla.redhat.com/show_bug.cgi?id=855495
+pushd %{buildroot}%{_bindir}
+ln -s python3-pip pip-python3
+popd
 
 # The install process creates both pip and pip-<python_abiversion> that seem to
 # be the same. Remove the extra script
@@ -89,7 +96,14 @@ popd
 
 # Change the name of the pip executable in order to not conflict with perl-pip
 # https://bugzilla.redhat.com/show_bug.cgi?id=616399
-mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/pip-python
+mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/python-pip
+
+# after changing the pip-python binary name, make a symlink to the old name,
+# that will be removed in a later version
+# https://bugzilla.redhat.com/show_bug.cgi?id=855495
+pushd %{buildroot}%{_bindir}
+ln -s python-pip pip-python
+popd
 
 
 %clean
@@ -102,6 +116,7 @@ mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/pip-python
 %defattr(-,root,root,-)
 %doc PKG-INFO docs
 %attr(755,root,root) %{_bindir}/pip-python
+%attr(755,root,root) %{_bindir}/python-pip
 %{python_sitelib}/pip*
 
 %if 0%{?with_python3}
@@ -113,11 +128,10 @@ mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/pip-python
 %endif # with_python3
 
 %changelog
-* Sat Aug 04 2012 David Malcolm <dmalcolm@redhat.com> - 1.1-3
-- rebuild for https://fedoraproject.org/wiki/Features/Python_3.3
-
-* Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+* Thu Oct 04 2012 Tim Flink <tflink@fedoraproject.org> - 1.2.1-1
+- Update to upstream 1.2.1
+- Change binary from pip-python to python-pip (RHBZ#855495)
+- Add alias from python-pip to pip-python, to be removed at a later date
 
 * Tue May 15 2012 Tim Flink <tflink@fedoraproject.org> - 1.1.0-1
 - Update to upstream 1.1.0
