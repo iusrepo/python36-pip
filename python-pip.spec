@@ -9,7 +9,7 @@
 
 Name:           python-%{srcname}
 Version:        1.2.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Pip installs packages.  Python3 packages.  An easy_install replacement
 
 Group:          Development/Libraries
@@ -124,10 +124,14 @@ popd
 %defattr(-,root,root,-)
 %doc PKG-INFO docs
 %attr(755,root,root) %{_bindir}/pip-python3
+%attr(755,root,root) %{_bindir}/python3-pip
 %{python3_sitelib}/pip*
 %endif # with_python3
 
 %changelog
+* Tue Oct 09 2012 Tim Flink <tflink@fedoraproject.org> - 1.2.1-2
+- Fixing files for python3-pip
+
 * Thu Oct 04 2012 Tim Flink <tflink@fedoraproject.org> - 1.2.1-1
 - Update to upstream 1.2.1
 - Change binary from pip-python to python-pip (RHBZ#855495)
