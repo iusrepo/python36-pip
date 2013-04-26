@@ -8,8 +8,8 @@
 %global srcname pip
 
 Name:           python-%{srcname}
-Version:        1.2.1
-Release:        3%{?dist}
+Version:        1.3.1
+Release:        1%{?dist}
 Summary:        Pip installs packages.  Python3 packages.  An easy_install replacement
 
 Group:          Development/Libraries
@@ -129,6 +129,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Fri Apr 26 2013 Jon Ciesla <limburgher@gmail.com> - 1.3.1-1
+- Update to 1.3.1, fix for CVE-2013-1888.
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
