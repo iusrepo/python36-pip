@@ -9,8 +9,8 @@
 
 Name:           python-%{srcname}
 Version:        1.3.1
-Release:        1%{?dist}
-Summary:        Pip installs packages.  Python3 packages.  An easy_install replacement
+Release:        2%{?dist}
+Summary:        Pip installs packages.  Python2 packages.  An easy_install replacement
 
 Group:          Development/Libraries
 License:        MIT
@@ -129,6 +129,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Mon May 06 2013 Kevin Kofler <Kevin@tigcc.ticalc.org> - 1.3.1-2
+- Fix main package Summary, it's for Python 2, not 3 (#877401)
+
 * Fri Apr 26 2013 Jon Ciesla <limburgher@gmail.com> - 1.3.1-1
 - Update to 1.3.1, fix for CVE-2013-1888.
 
