@@ -9,8 +9,8 @@
 
 Name:           python-%{srcname}
 Version:        1.3.1
-Release:        2%{?dist}
-Summary:        Pip installs packages.  Python2 packages.  An easy_install replacement
+Release:        3%{?dist}
+Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
 License:        MIT
@@ -32,7 +32,7 @@ easy_installable should be pip-installable as well.
 
 %if 0%{?with_python3}
 %package -n python3-pip
-Summary:        Pip installs packages.  Python3 packages.  An easy_install replacement
+Summary:        A tool for installing and managing Python3 packages
 Group:          Development/Libraries
 
 BuildRequires:  python3-devel
@@ -54,6 +54,7 @@ easy_installable should be pip-installable as well.
 cp -a . %{py3dir}
 %endif # with_python3
 
+
 %build
 %{__python} setup.py build
 
@@ -63,6 +64,7 @@ pushd %{py3dir}
 popd
 %endif # with_python3
 
+
 %install
 %{__rm} -rf %{buildroot}
 
@@ -70,8 +72,8 @@ popd
 pushd %{py3dir}
 %{__python3} setup.py install -O1 --skip-build --root %{buildroot}
 
-# Change the name of the pip executable in order to not conflict with perl-pip
-# https://bugzilla.redhat.com/show_bug.cgi?id=616399
+# Change the name of the python3 pip executable in order to not conflict with
+# the python2 executable
 mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/python3-pip
 
 # after changing the pip-python binary name, make a symlink to the old name,
@@ -79,30 +81,30 @@ mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/python3-pip
 # https://bugzilla.redhat.com/show_bug.cgi?id=855495
 pushd %{buildroot}%{_bindir}
 ln -s python3-pip pip-python3
-popd
 
 # The install process creates both pip and pip-<python_abiversion> that seem to
 # be the same. Remove the extra script
-rm %{buildroot}%{_bindir}/pip-3*
+%{__rm} -rf pip-3*
 
 popd
 %endif # with_python3
 
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
 
+pushd %{buildroot}%{_bindir}
 # The install process creates both pip and pip-<python_abiversion> that seem to
 # be the same. Since removing pip-* also clobbers pip-python3, just remove pip-2*
-%{__rm} -rf %{buildroot}%{_bindir}/pip-2*
+%{__rm} -rf pip-2*
 
-# Change the name of the pip executable in order to not conflict with perl-pip
-# https://bugzilla.redhat.com/show_bug.cgi?id=616399
-mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/python-pip
+# The pip executable no longer needs to be renamed to avoid conflict with perl-pip
+# https://bugzilla.redhat.com/show_bug.cgi?id=958377
+# However, we'll keep a python-pip alias for now
+ln -s pip python-pip
 
 # after changing the pip-python binary name, make a symlink to the old name,
 # that will be removed in a later version
 # https://bugzilla.redhat.com/show_bug.cgi?id=855495
-pushd %{buildroot}%{_bindir}
-ln -s python-pip pip-python
+ln -s pip pip-python
 popd
 
 
@@ -115,6 +117,7 @@ popd
 %files
 %defattr(-,root,root,-)
 %doc PKG-INFO docs
+%attr(755,root,root) %{_bindir}/pip
 %attr(755,root,root) %{_bindir}/pip-python
 %attr(755,root,root) %{_bindir}/python-pip
 %{python_sitelib}/pip*
@@ -129,6 +132,10 @@ popd
 %endif # with_python3
 
 %changelog
+* Thu May 23 2013 Tim Flink <tflink@fedoraproject.org> - 1.3.1-3
+- undo python2 executable rename to python-pip. fixes #958377
+- fix summary to match upstream
+
 * Mon May 06 2013 Kevin Kofler <Kevin@tigcc.ticalc.org> - 1.3.1-2
 - Fix main package Summary, it's for Python 2, not 3 (#877401)
 
