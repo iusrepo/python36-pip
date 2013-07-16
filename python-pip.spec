@@ -9,13 +9,15 @@
 
 Name:           python-%{srcname}
 Version:        1.3.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
 License:        MIT
 URL:            http://www.pip-installer.org
 Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
+# Sent to dstufft (upstream)
+Patch0: 0001-fix-for-http-bugs.python.org-issue17980-in-code-back.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
@@ -48,6 +50,8 @@ easy_installable should be pip-installable as well.
 
 %prep
 %setup -q -n %{srcname}-%{version}
+%patch0 -p1
+
 %{__sed} -i '1d' pip/__init__.py
 
 %if 0%{?with_python3}
@@ -70,7 +74,7 @@ popd
 
 %if 0%{?with_python3}
 pushd %{py3dir}
-%{__python3} setup.py install -O1 --skip-build --root %{buildroot}
+%{__python3} setup.py install --skip-build --root %{buildroot}
 
 # Change the name of the python3 pip executable in order to not conflict with
 # the python2 executable
@@ -132,6 +136,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Tue Jul 16 2013 Toshio Kuratomi <toshio@fedoraproject.org> - 1.3.1-4
+- Fix for CVE 2013-2099
+
 * Thu May 23 2013 Tim Flink <tflink@fedoraproject.org> - 1.3.1-3
 - undo python2 executable rename to python-pip. fixes #958377
 - fix summary to match upstream
