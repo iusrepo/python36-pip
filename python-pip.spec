@@ -9,7 +9,7 @@
 
 Name:           python-%{srcname}
 Version:        1.3.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -136,6 +136,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
 * Tue Jul 16 2013 Toshio Kuratomi <toshio@fedoraproject.org> - 1.3.1-4
 - Fix for CVE 2013-2099
 
