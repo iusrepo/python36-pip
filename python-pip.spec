@@ -8,16 +8,14 @@
 %global srcname pip
 
 Name:           python-%{srcname}
-Version:        1.3.1
-Release:        5%{?dist}
+Version:        1.4.1
+Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
 License:        MIT
 URL:            http://www.pip-installer.org
 Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
-# Sent to dstufft (upstream)
-Patch0: 0001-fix-for-http-bugs.python.org-issue17980-in-code-back.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
@@ -50,7 +48,6 @@ easy_installable should be pip-installable as well.
 
 %prep
 %setup -q -n %{srcname}-%{version}
-%patch0 -p1
 
 %{__sed} -i '1d' pip/__init__.py
 
@@ -136,6 +133,10 @@ popd
 %endif # with_python3
 
 %changelog
+* Mon Oct 14 2013 Tim Flink <tflink@fedoraproject.org> - 1.4.1-1
+- Removed patch for CVE 2013-2099 as it has been included in the upstream 1.4.1 release
+- Updated version to 1.4.1
+
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
