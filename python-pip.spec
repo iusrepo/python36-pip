@@ -1,4 +1,4 @@
-%if (! 0%{?rhel}) || 0%{?rhel} > 6
+%if (! 0%{?rhel}) || 0%{?rhel} > 7
 %global with_python3 1
 %endif
 %if 0%{?rhel} && 0%{?rhel} < 6
