@@ -1,14 +1,21 @@
 %if (! 0%{?rhel}) || 0%{?rhel} > 6
 %global with_python3 1
+%global build_wheel 0
 %endif
 %if 0%{?rhel} && 0%{?rhel} < 6
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %endif
 
 %global srcname pip
+%if 0%{?build_wheel}
+%global python2_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
+%if 0%{?with_python3}
+%global python3_wheelname %python2_wheelname
+%endif
+%endif
 
 Name:           python-%{srcname}
-Version:        1.4.1
+Version:        1.5.4
 Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
@@ -16,11 +23,16 @@ Group:          Development/Libraries
 License:        MIT
 URL:            http://www.pip-installer.org
 Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
+Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools
+%if 0%{?build_wheel}
+BuildRequires:  python-pip
+BuildRequires:  python-wheel
+%endif
 Requires:       python-setuptools
 
 %description
@@ -37,6 +49,10 @@ Group:          Development/Libraries
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+%if 0%{?build_wheel}
+BuildRequires:  python3-pip
+BuildRequires:  python3-wheel
+%endif
 Requires:  python3-setuptools
 
 %description -n python3-pip
@@ -49,6 +65,8 @@ easy_installable should be pip-installable as well.
 %prep
 %setup -q -n %{srcname}-%{version}
 
+%patch0 -p1
+
 %{__sed} -i '1d' pip/__init__.py
 
 %if 0%{?with_python3}
@@ -57,11 +75,19 @@ cp -a . %{py3dir}
 
 
 %build
+%if 0%{?build_wheel}
+%{__python} setup.py bdist_wheel
+%else
 %{__python} setup.py build
+%endif
 
 %if 0%{?with_python3}
 pushd %{py3dir}
+%if 0%{?build_wheel}
+%{__python3} setup.py bdist_wheel
+%else
 %{__python3} setup.py build
+%endif
 popd
 %endif # with_python3
 
@@ -71,42 +97,21 @@ popd
 
 %if 0%{?with_python3}
 pushd %{py3dir}
+%if 0%{?build_wheel}
+pip3 install -I dist/%{python3_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
+# TODO: we have to remove this by hand now, but it'd be nice if we wouldn't have to
+# (pip install wheel doesn't overwrite)
+rm %{buildroot}%{_bindir}/pip
+%else
 %{__python3} setup.py install --skip-build --root %{buildroot}
-
-# Change the name of the python3 pip executable in order to not conflict with
-# the python2 executable
-mv %{buildroot}%{_bindir}/pip %{buildroot}%{_bindir}/python3-pip
-
-# after changing the pip-python binary name, make a symlink to the old name,
-# that will be removed in a later version
-# https://bugzilla.redhat.com/show_bug.cgi?id=855495
-pushd %{buildroot}%{_bindir}
-ln -s python3-pip pip-python3
-
-# The install process creates both pip and pip-<python_abiversion> that seem to
-# be the same. Remove the extra script
-%{__rm} -rf pip-3*
-
-popd
+%endif
 %endif # with_python3
 
+%if 0%{?build_wheel}
+pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
+%else
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
-
-pushd %{buildroot}%{_bindir}
-# The install process creates both pip and pip-<python_abiversion> that seem to
-# be the same. Since removing pip-* also clobbers pip-python3, just remove pip-2*
-%{__rm} -rf pip-2*
-
-# The pip executable no longer needs to be renamed to avoid conflict with perl-pip
-# https://bugzilla.redhat.com/show_bug.cgi?id=958377
-# However, we'll keep a python-pip alias for now
-ln -s pip python-pip
-
-# after changing the pip-python binary name, make a symlink to the old name,
-# that will be removed in a later version
-# https://bugzilla.redhat.com/show_bug.cgi?id=855495
-ln -s pip pip-python
-popd
+%endif
 
 
 %clean
@@ -117,22 +122,23 @@ popd
 
 %files
 %defattr(-,root,root,-)
-%doc PKG-INFO docs
+%doc LICENSE.txt README.rst docs
 %attr(755,root,root) %{_bindir}/pip
-%attr(755,root,root) %{_bindir}/pip-python
-%attr(755,root,root) %{_bindir}/python-pip
+%attr(755,root,root) %{_bindir}/pip2*
 %{python_sitelib}/pip*
 
 %if 0%{?with_python3}
 %files -n python3-pip
 %defattr(-,root,root,-)
-%doc PKG-INFO docs
-%attr(755,root,root) %{_bindir}/pip-python3
-%attr(755,root,root) %{_bindir}/python3-pip
+%doc LICENSE.txt README.rst docs
+%attr(755,root,root) %{_bindir}/pip3*
 %{python3_sitelib}/pip*
 %endif # with_python3
 
 %changelog
+* Mon Apr 07 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.4-1
+- Updated to 1.5.4
+
 * Mon Oct 14 2013 Tim Flink <tflink@fedoraproject.org> - 1.4.1-1
 - Removed patch for CVE 2013-2099 as it has been included in the upstream 1.4.1 release
 - Updated version to 1.4.1
@@ -192,9 +198,9 @@ popd
 - update to 0.7.1 of pip
 * Fri Jan 1 2010 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1.4
 - fix dependency issue
-* Tue Dec 18 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-2
+* Fri Dec 18 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-2
 - fix spec file 
-* Mon Dec 17 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-1
+* Thu Dec 17 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.6.1-1
 - upgrade to 0.6.1 of pip
 * Mon Aug 31 2009 Peter Halliday <phalliday@excelsiorsystems.net> - 0.4-1
 - Initial package
