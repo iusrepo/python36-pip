@@ -1,6 +1,6 @@
 %if (! 0%{?rhel}) || 0%{?rhel} > 6
 %global with_python3 1
-%global build_wheel 0
+%global build_wheel 1
 %endif
 %if 0%{?rhel} && 0%{?rhel} < 6
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
@@ -16,7 +16,7 @@
 
 Name:           python-%{srcname}
 Version:        1.5.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -136,6 +136,9 @@ pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefi
 %endif # with_python3
 
 %changelog
+* Fri Apr 25 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.4-4
+- Rebuild as wheel for Python 3.4
+
 * Thu Apr 24 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.4-3
 - Disable build_wheel
 
