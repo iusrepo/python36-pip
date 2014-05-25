@@ -15,8 +15,8 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        1.5.4
-Release:        4%{?dist}
+Version:        1.5.6
+Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -136,6 +136,9 @@ pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefi
 %endif # with_python3
 
 %changelog
+* Sun May 25 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.6-1
+- Update to 1.5.6
+
 * Fri Apr 25 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.4-4
 - Rebuild as wheel for Python 3.4
 
