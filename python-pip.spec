@@ -16,7 +16,7 @@
 
 Name:           python-%{srcname}
 Version:        1.5.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -136,6 +136,9 @@ pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefi
 %endif # with_python3
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.5.6-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Sun May 25 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.6-1
 - Update to 1.5.6
 
