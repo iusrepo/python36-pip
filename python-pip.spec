@@ -16,23 +16,33 @@
 
 Name:           python-%{srcname}
 Version:        1.5.6
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
 License:        MIT
 URL:            http://www.pip-installer.org
 Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
-Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
 
+# to get tests:
+# git clone https://github.com/pypa/pip && cd fig
+# git checkout 1.5.6 && tar -czvf pip-1.5.6-tests.tar.gz tests/
+Source1:        pip-1.5.6-tests.tar.gz
+
+Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
 # patch by dstufft, more at http://seclists.org/oss-sec/2014/q4/655
 Patch1:         local-dos.patch
+Patch2:         skip-network-tests.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools
+BuildRequires:  python-mock
+BuildRequires:  pytest
+BuildRequires:  python-scripttest
+BuildRequires:  python-virtualenv
 %if 0%{?build_wheel}
 BuildRequires:  python-pip
 BuildRequires:  python-wheel
@@ -68,9 +78,11 @@ easy_installable should be pip-installable as well.
 
 %prep
 %setup -q -n %{srcname}-%{version}
+tar -xf %{SOURCE1}
 
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %{__sed} -i '1d' pip/__init__.py
 
@@ -118,6 +130,9 @@ pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefi
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
 %endif
 
+%check
+python setup.py test
+
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -141,6 +156,10 @@ pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefi
 %endif # with_python3
 
 %changelog
+* Mon Dec 01 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.6-4
+- Add tests
+- Add patch skipping tests requiring Internet access
+
 * Tue Nov 18 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.6-3
 - Added patch for local dos with predictable temp dictionary names
   (http://seclists.org/oss-sec/2014/q4/655)
