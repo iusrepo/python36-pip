@@ -1,6 +1,7 @@
 %if (! 0%{?rhel}) || 0%{?rhel} > 7
 %global with_python3 1
 %global build_wheel 1
+%global with_tests 1
 %endif
 %if 0%{?rhel} && 0%{?rhel} < 6
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
@@ -16,7 +17,7 @@
 
 Name:           python-%{srcname}
 Version:        1.5.6
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -39,10 +40,12 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools
+%if 0%{?with_tests}
 BuildRequires:  python-mock
 BuildRequires:  pytest
 BuildRequires:  python-scripttest
 BuildRequires:  python-virtualenv
+%endif
 %if 0%{?build_wheel}
 BuildRequires:  python-pip
 BuildRequires:  python-wheel
@@ -130,8 +133,10 @@ pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefi
 %{__python} setup.py install -O1 --skip-build --root %{buildroot}
 %endif
 
+%if 0%{?with_tests}
 %check
 python setup.py test
+%endif
 
 
 %clean
@@ -156,6 +161,9 @@ python setup.py test
 %endif # with_python3
 
 %changelog
+* Thu Dec 18 2014 Slavek Kabrda <bkabrda@redhat.com> - 1.5.6-5
+- Only enable tests on Fedora.
+
 * Mon Dec 01 2014 Matej Stuchlik <mstuchli@redhat.com> - 1.5.6-4
 - Add tests
 - Add patch skipping tests requiring Internet access
