@@ -9,7 +9,7 @@ index 1693d01..0287c06 100644
 --- a/pip/commands/install.py
 +++ b/pip/commands/install.py
 @@ -137,6 +137,14 @@ class InstallCommand(Command):
-             help="Install everything relative to this alternate root directory.")
+                  "directory.")
  
          cmd_opts.add_option(
 +            '--strip-file-prefix',
@@ -23,26 +23,22 @@ index 1693d01..0287c06 100644
              "--compile",
              action="store_true",
              dest="compile",
-@@ -273,7 +281,11 @@ class InstallCommand(Command):
-                 requirement_set.locate_files()
- 
-             if not options.no_install and not self.bundle:
--                requirement_set.install(install_options, global_options, root=options.root_path)
-+                requirement_set.install(
-+                    install_options,
-+                    global_options,
-+                    root=options.root_path,
-+                    strip_file_prefix=options.strip_file_prefix)
-                 installed = ' '.join([req.name for req in
-                                       requirement_set.successfully_installed])
-                 if installed:
-diff --git a/pip/req.py b/pip/req.py
+@@ -345,6 +353,7 @@ class InstallCommand(Command):
+                             install_options,
+                             global_options,
+                             root=options.root_path,
++                            strip_file_prefix=options.strip_file_prefix,
+                         )
+                         reqs = sorted(
+                             requirement_set.successfully_installed,
+
+diff --git a/pip/req/req_install.py b/pip/req/req_install.py
 index 3ae306d..c171130 100644
---- a/pip/req.py
-+++ b/pip/req.py
+--- a/pip/req/req_install.py
++++ b/pip/req/req_install.py
 @@ -615,15 +615,19 @@ exec(compile(open(__file__).read().replace('\\r\\n', '\\n'), __file__, 'exec'))
-         name = name.replace(os.path.sep, '/')
-         return name
+         else:
+             return True
  
 -    def install(self, install_options, global_options=(), root=None):
 +    def install(self, install_options, global_options=(), root=None, strip_file_prefix=None):
@@ -62,9 +58,9 @@ index 3ae306d..c171130 100644
              self.install_succeeded = True
              return
  
-@@ -844,13 +848,14 @@ exec(compile(open(__file__).read().replace('\\r\\n', '\\n'), __file__, 'exec'))
-         self._bundle_build_dirs = bundle_build_dirs
-         self._bundle_editable_dirs = bundle_editable_dirs
+@@ -844,14 +848,15 @@ exec(compile(open(__file__).read().replace('\\r\\n', '\\n'), __file__, 'exec'))
+     def is_wheel(self):
+         return self.url and '.whl' in self.url
  
 -    def move_wheel_files(self, wheeldir, root=None):
 +    def move_wheel_files(self, wheeldir, root=None, strip_file_prefix=None):
@@ -74,10 +70,11 @@ index 3ae306d..c171130 100644
              home=self.target_dir,
              root=root,
              pycompile=self.pycompile,
+             isolated=self.isolated,
 +            strip_file_prefix=strip_file_prefix,
          )
  
-     @property
+     def get_dist(self):
 diff --git a/pip/wheel.py b/pip/wheel.py
 index fa3e270..3a366d0 100644
 --- a/pip/wheel.py
@@ -86,8 +83,8 @@ index fa3e270..3a366d0 100644
  
  
  def move_wheel_files(name, req, wheeldir, user=False, home=None, root=None,
--                     pycompile=True, scheme=None):
-+                     pycompile=True, scheme=None, strip_file_prefix=None):
+-                     pycompile=True, scheme=None, isolated=False):
++                     pycompile=True, scheme=None, isolated=False, strip_file_prefix=None):
      """Install a wheel"""
  
      if not scheme:

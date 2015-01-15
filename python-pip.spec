@@ -1,7 +1,7 @@
 %if (! 0%{?rhel}) || 0%{?rhel} > 7
 %global with_python3 1
 %global build_wheel 1
-%global with_tests 1
+%global with_tests 0
 %endif
 %if 0%{?rhel} && 0%{?rhel} < 6
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
@@ -16,8 +16,8 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        1.5.6
-Release:        5%{?dist}
+Version:        6.0.8
+Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -28,12 +28,11 @@ Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{versio
 # to get tests:
 # git clone https://github.com/pypa/pip && cd fig
 # git checkout 1.5.6 && tar -czvf pip-1.5.6-tests.tar.gz tests/
-Source1:        pip-1.5.6-tests.tar.gz
+%if 0%{?with_tests}
+Source1:        pip-6.0.8-tests.tar.gz
+%endif
 
 Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
-# patch by dstufft, more at http://seclists.org/oss-sec/2014/q4/655
-Patch1:         local-dos.patch
-Patch2:         skip-network-tests.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -43,6 +42,8 @@ BuildRequires:  python-setuptools
 %if 0%{?with_tests}
 BuildRequires:  python-mock
 BuildRequires:  pytest
+BuildRequires:  python-pretend
+BuildRequires:  python-freezegun
 BuildRequires:  python-scripttest
 BuildRequires:  python-virtualenv
 %endif
@@ -66,6 +67,14 @@ Group:          Development/Libraries
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-setuptools
+%if 0%{?with_tests}
+BuildRequires:  python3-mock
+BuildRequires:  python3-pytest
+BuildRequires:  python3-pretend
+BuildRequires:  python3-freezegun
+BuildRequires:  python3-scripttest
+BuildRequires:  python3-virtualenv
+%endif
 %if 0%{?build_wheel}
 BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
@@ -81,11 +90,11 @@ easy_installable should be pip-installable as well.
 
 %prep
 %setup -q -n %{srcname}-%{version}
+%if 0%{?with_tests}
 tar -xf %{SOURCE1}
+%endif
 
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %{__sed} -i '1d' pip/__init__.py
 
@@ -135,7 +144,10 @@ pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefi
 
 %if 0%{?with_tests}
 %check
-python setup.py test
+py.test -m 'not network'
+pushd %{py3dir}
+py.test-3.4 -m 'not network'
+popd
 %endif
 
 
@@ -161,6 +173,9 @@ python setup.py test
 %endif # with_python3
 
 %changelog
+* Fri Mar 06 2015 Matej Stuchlik <mstuchli@redhat.com> - 6.0.8-1
+- Update to 6.0.8
+
 * Thu Dec 18 2014 Slavek Kabrda <bkabrda@redhat.com> - 1.5.6-5
 - Only enable tests on Fedora.
 
