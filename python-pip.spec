@@ -16,7 +16,7 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        6.0.8
+Version:        7.0.3
 Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
@@ -173,6 +173,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Thu Jun 04 2015 Matej Stuchlik <mstuchli@redhat.com> - 7.0.3-1
+- Update to 7.0.3
+
 * Fri Mar 06 2015 Matej Stuchlik <mstuchli@redhat.com> - 6.0.8-1
 - Update to 6.0.8
 

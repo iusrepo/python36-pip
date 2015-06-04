@@ -40,8 +40,8 @@ index 3ae306d..c171130 100644
          else:
              return True
  
--    def install(self, install_options, global_options=(), root=None):
-+    def install(self, install_options, global_options=(), root=None, strip_file_prefix=None):
+-    def install(self, install_options, global_options=[], root=None):
++    def install(self, install_options, global_options=[], root=None, strip_file_prefix=None):
          if self.editable:
              self.install_editable(install_options, global_options)
              return
@@ -60,7 +60,7 @@ index 3ae306d..c171130 100644
  
 @@ -844,14 +848,15 @@ exec(compile(open(__file__).read().replace('\\r\\n', '\\n'), __file__, 'exec'))
      def is_wheel(self):
-         return self.url and '.whl' in self.url
+         return self.link and self.link.is_wheel
  
 -    def move_wheel_files(self, wheeldir, root=None):
 +    def move_wheel_files(self, wheeldir, root=None, strip_file_prefix=None):
