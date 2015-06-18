@@ -17,7 +17,7 @@
 
 Name:           python-%{srcname}
 Version:        7.0.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -173,6 +173,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.0.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Thu Jun 04 2015 Matej Stuchlik <mstuchli@redhat.com> - 7.0.3-1
 - Update to 7.0.3
 
