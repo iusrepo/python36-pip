@@ -21,8 +21,8 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        7.0.3
-Release:        3%{?dist}
+Version:        7.1.0
+Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -232,6 +232,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Wed Jul 01 2015 Slavek Kabrda <bkabrda@redhat.com> - 7.1.0-1
+- Update to 7.1.0
+
 * Tue Jun 30 2015 Ville Skyttä <ville.skytta@iki.fi> - 7.0.3-3
 - Install bash completion
 - Ship LICENSE.txt as %%license where available
