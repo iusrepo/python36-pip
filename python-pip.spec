@@ -1,6 +1,6 @@
 %if (! 0%{?rhel}) || 0%{?rhel} > 7
 %global with_python3 1
-%global build_wheel 1
+%global build_wheel 0
 %global with_tests 0
 %endif
 %if 0%{?rhel} && 0%{?rhel} < 6
@@ -22,7 +22,7 @@
 
 Name:           python-%{srcname}
 Version:        7.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -232,6 +232,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Tue Oct 13 2015 Robert Kuska <rkuska@redhat.com> - 7.1.0-2
+- Rebuilt for Python3.5 rebuild
+
 * Wed Jul 01 2015 Slavek Kabrda <bkabrda@redhat.com> - 7.1.0-1
 - Update to 7.1.0
 
