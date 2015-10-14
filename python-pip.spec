@@ -1,6 +1,6 @@
 %if (! 0%{?rhel}) || 0%{?rhel} > 7
 %global with_python3 1
-%global build_wheel 0
+%global build_wheel 1
 %global with_tests 0
 %endif
 %if 0%{?rhel} && 0%{?rhel} < 6
@@ -22,7 +22,7 @@
 
 Name:           python-%{srcname}
 Version:        7.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -34,7 +34,7 @@ Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{versio
 # git clone https://github.com/pypa/pip && cd fig
 # git checkout 1.5.6 && tar -czvf pip-1.5.6-tests.tar.gz tests/
 %if 0%{?with_tests}
-Source1:        pip-6.0.8-tests.tar.gz
+Source1:        pip-7.1.0-tests.tar.gz
 %endif
 
 Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
@@ -232,6 +232,10 @@ popd
 %endif # with_python3
 
 %changelog
+* Wed Oct 14 2015 Robert Kuska <rkuska@redhat.com> - 7.1.0-3
+- Rebuilt for Python3.5 rebuild
+- With wheel set to 1
+
 * Tue Oct 13 2015 Robert Kuska <rkuska@redhat.com> - 7.1.0-2
 - Rebuilt for Python3.5 rebuild
 
