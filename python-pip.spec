@@ -21,8 +21,8 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        7.1.0
-Release:        4%{?dist}
+Version:        8.0.2
+Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -31,10 +31,10 @@ URL:            http://www.pip-installer.org
 Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
 
 # to get tests:
-# git clone https://github.com/pypa/pip && cd fig
-# git checkout 1.5.6 && tar -czvf pip-1.5.6-tests.tar.gz tests/
+# git clone https://github.com/pypa/pip && cd pip
+# git checkout 8.0.2 && tar -czvf pip-8.0.2-tests.tar.gz tests/
 %if 0%{?with_tests}
-Source1:        pip-7.1.0-tests.tar.gz
+Source1:        pip-8.0.2-tests.tar.gz
 %endif
 
 Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
@@ -45,10 +45,12 @@ BuildArch:      noarch
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools
 %if 0%{?with_tests}
+BuildRequires:  git
 BuildRequires:  python-mock
 BuildRequires:  pytest
 BuildRequires:  python-pretend
 BuildRequires:  python-freezegun
+BuildRequires:  python-pytest-capturelog
 BuildRequires:  python-scripttest
 BuildRequires:  python-virtualenv
 %endif
@@ -78,6 +80,7 @@ BuildRequires:  python3-mock
 BuildRequires:  python3-pytest
 BuildRequires:  python3-pretend
 BuildRequires:  python3-freezegun
+BuildRequires:  python3-pytest-capturelog
 BuildRequires:  python3-scripttest
 BuildRequires:  python3-virtualenv
 %endif
@@ -232,6 +235,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Mon Feb 22 2016 Slavek Kabrda <bkabrda@redhat.com> - 8.0.2-1
+- Update to 8.0.2
+
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 7.1.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
