@@ -21,14 +21,14 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        8.0.2
+Version:        8.1.2
 Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
 License:        MIT
 URL:            http://www.pip-installer.org
-Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
+Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
 
 # to get tests:
 # git clone https://github.com/pypa/pip && cd pip
@@ -37,7 +37,9 @@ Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{versio
 Source1:        pip-8.0.2-tests.tar.gz
 %endif
 
-Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
+# Patch until the following issue gets implemented upstream:
+# https://github.com/pypa/pip/issues/1351
+Patch0:         allow-stripping-given-prefix-from-wheel-RECORD-files.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -235,6 +237,11 @@ popd
 %endif # with_python3
 
 %changelog
+* Tue May 17 2016 Tomas Orsava <torsava@redhat.com> - 8.1.2-1
+- Update to 8.1.2
+- Moved to a new PyPI URL format
+- Updated the prefix-stripping patch because of upstream changes in pip/wheel.py
+
 * Mon Feb 22 2016 Slavek Kabrda <bkabrda@redhat.com> - 8.0.2-1
 - Update to 8.0.2
 

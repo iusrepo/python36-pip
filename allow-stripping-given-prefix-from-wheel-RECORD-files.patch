@@ -1,14 +1,24 @@
-commit aefacbb76661520415a1c35028f2984e70cfe0bf
-Author: Slavek Kabrda <bkabrda@redhat.com>
-Date:   Fri Nov 29 13:24:58 2013 +0100
+From 7b3991c99cd8bb9358e109901d4aa8f51269a87a Mon Sep 17 00:00:00 2001
+From: Tomas Orsava <tomas.n@orsava.cz>
+Date: Tue, 17 May 2016 16:40:37 +0200
+Subject: [PATCH] Allow stripping given prefix from wheel RECORD files
 
-    Allow stripping given prefix from wheel RECORD files
+Update of a previous patch [0] by Slavek Kabrda <bkabrda@redhat.com>.
+Changes in the pip/wheel.py file in upstream prevented #2 hunk from being
+applied cleanly.
+
+[0] pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
+---
+ pip/commands/install.py |  9 +++++++++
+ pip/req/req_install.py  | 13 +++++++++----
+ pip/wheel.py            |  8 ++++++--
+ 3 files changed, 24 insertions(+), 6 deletions(-)
 
 diff --git a/pip/commands/install.py b/pip/commands/install.py
-index 1693d01..0287c06 100644
+index 7ddde93..e31bd3e 100644
 --- a/pip/commands/install.py
 +++ b/pip/commands/install.py
-@@ -137,6 +137,14 @@ class InstallCommand(Command):
+@@ -137,6 +137,14 @@ class InstallCommand(RequirementCommand):
                   "directory.")
  
          cmd_opts.add_option(
@@ -23,7 +33,7 @@ index 1693d01..0287c06 100644
              '--prefix',
              dest='prefix_path',
              metavar='dir',
-@@ -345,6 +353,7 @@ class InstallCommand(Command):
+@@ -315,6 +323,7 @@ class InstallCommand(RequirementCommand):
                              global_options,
                              root=options.root_path,
                              prefix=options.prefix_path,
@@ -31,12 +41,11 @@ index 1693d01..0287c06 100644
                          )
                          reqs = sorted(
                              requirement_set.successfully_installed,
-
 diff --git a/pip/req/req_install.py b/pip/req/req_install.py
-index 3ae306d..c171130 100644
+index 9e9fbbb..47f263f 100644
 --- a/pip/req/req_install.py
 +++ b/pip/req/req_install.py
-@@ -615,17 +615,21 @@ exec(compile(open(__file__).read().replace('\\r\\n', '\\n'), __file__, 'exec'))
+@@ -818,8 +818,7 @@ class InstallRequirement(object):
          else:
              return True
  
@@ -46,8 +55,7 @@ index 3ae306d..c171130 100644
          if self.editable:
              self.install_editable(
                  install_options, global_options, prefix=prefix)
-             return
-         if self.is_wheel:
+@@ -828,7 +827,12 @@ class InstallRequirement(object):
              version = pip.wheel.wheel_version(self.source_dir)
              pip.wheel.check_compatibility(version, self.name)
  
@@ -61,7 +69,7 @@ index 3ae306d..c171130 100644
              self.install_succeeded = True
              return
  
-@@ -844,15 +848,16 @@ exec(compile(open(__file__).read().replace('\\r\\n', '\\n'), __file__, 'exec'))
+@@ -1021,7 +1025,7 @@ class InstallRequirement(object):
      def is_wheel(self):
          return self.link and self.link.is_wheel
  
@@ -70,8 +78,7 @@ index 3ae306d..c171130 100644
          move_wheel_files(
              self.name, self.req, wheeldir,
              user=self.use_user_site,
-             home=self.target_dir,
-             root=root,
+@@ -1030,6 +1034,7 @@ class InstallRequirement(object):
              prefix=prefix,
              pycompile=self.pycompile,
              isolated=self.isolated,
@@ -80,10 +87,10 @@ index 3ae306d..c171130 100644
  
      def get_dist(self):
 diff --git a/pip/wheel.py b/pip/wheel.py
-index fa3e270..3a366d0 100644
+index b257d76..6d78ce6 100644
 --- a/pip/wheel.py
 +++ b/pip/wheel.py
-@@ -136,7 +136,7 @@ def get_entrypoints(filename):
+@@ -238,7 +238,7 @@ def get_entrypoints(filename):
  
  
  def move_wheel_files(name, req, wheeldir, user=False, home=None, root=None,
@@ -92,12 +99,19 @@ index fa3e270..3a366d0 100644
      """Install a wheel"""
  
      if not scheme:
-@@ -357,6 +357,8 @@ if __name__ == '__main__':
+@@ -522,7 +522,11 @@ if __name__ == '__main__':
                  writer.writerow(row)
              for f in generated:
                  h, l = rehash(f)
-+                if strip_file_prefix and f.startswith(strip_file_prefix):
-+                    f = os.path.join(os.sep, os.path.relpath(f, strip_file_prefix))
-                 writer.writerow((f, h, l))
+-                writer.writerow((normpath(f, lib_dir), h, l))
++                final_path = normpath(f, lib_dir)
++                if strip_file_prefix and final_path.startswith(strip_file_prefix):
++                    final_path = os.path.join(os.sep,
++                            os.path.relpath(final_path, strip_file_prefix))
++                writer.writerow((final_path, h, l))
              for f in installed:
                  writer.writerow((installed[f], '', ''))
+     shutil.move(temp_record, record)
+-- 
+2.5.5
+
