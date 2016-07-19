@@ -22,7 +22,7 @@
 
 Name:           python-%{srcname}
 Version:        8.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -237,6 +237,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.1.2-2
+- https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
+
 * Tue May 17 2016 Tomas Orsava <torsava@redhat.com> - 8.1.2-1
 - Update to 8.1.2
 - Moved to a new PyPI URL format
