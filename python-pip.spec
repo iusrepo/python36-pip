@@ -22,13 +22,16 @@
 
 Name:           python-%{srcname}
 Version:        8.1.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
 License:        MIT
 URL:            http://www.pip-installer.org
 Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
+
+BuildArch:      noarch
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # to get tests:
 # git clone https://github.com/pypa/pip && cd pip
@@ -41,9 +44,16 @@ Source1:        pip-8.0.2-tests.tar.gz
 # https://github.com/pypa/pip/issues/1351
 Patch0:         allow-stripping-given-prefix-from-wheel-RECORD-files.patch
 
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%description
+Pip is a replacement for `easy_install
+<http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
+same techniques for finding packages, so packages that were made
+easy_installable should be pip-installable as well.
 
-BuildArch:      noarch
+
+%package -n python2-%{srcname}
+Summary:        A tool for installing and managing Python 2 packages
+Group:          Development/Libraries
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools
 %if 0%{?with_tests}
@@ -61,8 +71,9 @@ BuildRequires:  python-pip
 BuildRequires:  python-wheel
 %endif
 Requires:       python-setuptools
+%{?python_provide:%python_provide python2-%{srcname}}
 
-%description
+%description -n python2-%{srcname}
 Pip is a replacement for `easy_install
 <http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
 same techniques for finding packages, so packages that were made
@@ -70,7 +81,7 @@ easy_installable should be pip-installable as well.
 
 
 %if 0%{?with_python3}
-%package -n python3-pip
+%package -n python3-%{srcname}
 Summary:        A tool for installing and managing Python3 packages
 Group:          Development/Libraries
 
@@ -91,13 +102,15 @@ BuildRequires:  python3-pip
 BuildRequires:  python3-wheel
 %endif
 Requires:  python3-setuptools
+%{?python_provide:%python_provide python3-%{srcname}}
 
-%description -n python3-pip
+%description -n python3-%{srcname}
 Pip is a replacement for `easy_install
 <http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
 same techniques for finding packages, so packages that were made
 easy_installable should be pip-installable as well.
 %endif # with_python3
+
 
 %prep
 %setup -q -n %{srcname}-%{version}
@@ -206,7 +219,8 @@ popd
 # unfortunately, pip's test suite requires virtualenv >= 1.6 which isn't in
 # fedora yet. Once it is, check can be implemented
 
-%files
+
+%files -n python2-%{srcname}
 %defattr(-,root,root,-)
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
@@ -223,7 +237,7 @@ popd
 %endif
 
 %if 0%{?with_python3}
-%files -n python3-pip
+%files -n python3-%{srcname}
 %defattr(-,root,root,-)
 %license LICENSE.txt
 %doc README.rst docs
@@ -237,6 +251,10 @@ popd
 %endif # with_python3
 
 %changelog
+* Fri Aug 05 2016 Tomas Orsava <torsava@redhat.com> - 8.1.2-3
+- Moved python-pip into the python2-pip subpackage
+- Added the python_provide macro
+
 * Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.1.2-2
 - https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
 
