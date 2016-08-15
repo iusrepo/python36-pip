@@ -22,7 +22,7 @@
 
 Name:           python-%{srcname}
 Version:        8.1.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -37,7 +37,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # git clone https://github.com/pypa/pip && cd pip
 # git checkout 8.0.2 && tar -czvf pip-8.0.2-tests.tar.gz tests/
 %if 0%{?with_tests}
-Source1:        pip-8.0.2-tests.tar.gz
+Source1:        pip-8.1.2-tests.tar.gz
 %endif
 
 # Patch until the following issue gets implemented upstream:
@@ -58,6 +58,7 @@ BuildRequires:  python-devel
 BuildRequires:  python-setuptools
 %if 0%{?with_tests}
 BuildRequires:  git
+BuildRequires:  bzr
 BuildRequires:  python-mock
 BuildRequires:  pytest
 BuildRequires:  python-pretend
@@ -208,16 +209,13 @@ sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips2/" \
 %check
 py.test -m 'not network'
 pushd %{py3dir}
-py.test-3.4 -m 'not network'
+py.test-%{python3_version} -m 'not network'
 popd
 %endif
 
 
 %clean
 %{__rm} -rf %{buildroot}
-
-# unfortunately, pip's test suite requires virtualenv >= 1.6 which isn't in
-# fedora yet. Once it is, check can be implemented
 
 
 %files -n python2-%{srcname}
@@ -251,6 +249,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Fri Aug 05 2016 Tomas Orsava <torsava@redhat.com> - 8.1.2-4
+- Updated the test sources
+
 * Fri Aug 05 2016 Tomas Orsava <torsava@redhat.com> - 8.1.2-3
 - Moved python-pip into the python2-pip subpackage
 - Added the python_provide macro
