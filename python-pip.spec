@@ -1,11 +1,6 @@
-%if (! 0%{?rhel}) || 0%{?rhel} > 7
 %global with_python3 1
 %global build_wheel 1
 %global with_tests 0
-%endif
-%if 0%{?rhel} && 0%{?rhel} < 6
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%endif
 
 %global srcname pip
 %if 0%{?build_wheel}
@@ -22,7 +17,7 @@
 
 Name:           python-%{srcname}
 Version:        8.1.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -54,7 +49,7 @@ easy_installable should be pip-installable as well.
 %package -n python2-%{srcname}
 Summary:        A tool for installing and managing Python 2 packages
 Group:          Development/Libraries
-BuildRequires:  python-devel
+BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
 %if 0%{?with_tests}
 BuildRequires:  git
@@ -68,7 +63,7 @@ BuildRequires:  python-scripttest
 BuildRequires:  python-virtualenv
 %endif
 %if 0%{?build_wheel}
-BuildRequires:  python-pip
+BuildRequires:  python2-pip
 BuildRequires:  python-wheel
 %endif
 Requires:       python-setuptools
@@ -82,30 +77,30 @@ easy_installable should be pip-installable as well.
 
 
 %if 0%{?with_python3}
-%package -n python3-%{srcname}
+%package -n python%{python3_pkgversion}-%{srcname}
 Summary:        A tool for installing and managing Python3 packages
 Group:          Development/Libraries
 
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  bash-completion
 %if 0%{?with_tests}
-BuildRequires:  python3-mock
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pretend
-BuildRequires:  python3-freezegun
-BuildRequires:  python3-pytest-capturelog
-BuildRequires:  python3-scripttest
-BuildRequires:  python3-virtualenv
+BuildRequires:  python%{python3_pkgversion}-mock
+BuildRequires:  python%{python3_pkgversion}-pytest
+BuildRequires:  python%{python3_pkgversion}-pretend
+BuildRequires:  python%{python3_pkgversion}-freezegun
+BuildRequires:  python%{python3_pkgversion}-pytest-capturelog
+BuildRequires:  python%{python3_pkgversion}-scripttest
+BuildRequires:  python%{python3_pkgversion}-virtualenv
 %endif
 %if 0%{?build_wheel}
-BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
+BuildRequires:  python%{python3_pkgversion}-pip
+BuildRequires:  python%{python3_pkgversion}-wheel
 %endif
-Requires:  python3-setuptools
-%{?python_provide:%python_provide python3-%{srcname}}
+Requires:  python%{python3_pkgversion}-setuptools
+%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
 
-%description -n python3-%{srcname}
+%description -n python%{python3_pkgversion}-%{srcname}
 Pip is a replacement for `easy_install
 <http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
 same techniques for finding packages, so packages that were made
@@ -121,50 +116,41 @@ tar -xf %{SOURCE1}
 
 %patch0 -p1
 
-%{__sed} -i '1d' pip/__init__.py
-
-%if 0%{?with_python3}
-cp -a . %{py3dir}
-%endif # with_python3
+sed -i '1d' pip/__init__.py
 
 
 %build
 %if 0%{?build_wheel}
-%{__python} setup.py bdist_wheel
+%py2_build_wheel
 %else
-%{__python} setup.py build
+%py2_build
 %endif
 
 %if 0%{?with_python3}
-pushd %{py3dir}
 %if 0%{?build_wheel}
-%{__python3} setup.py bdist_wheel
+%py3_build_wheel
 %else
-%{__python3} setup.py build
+%py3_build
 %endif
-popd
 %endif # with_python3
 
 
 %install
-%{__rm} -rf %{buildroot}
-
 %if 0%{?with_python3}
-pushd %{py3dir}
 %if 0%{?build_wheel}
-pip3 install -I dist/%{python3_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
+%py3_install_wheel %{python3_wheelname}
 # TODO: we have to remove this by hand now, but it'd be nice if we wouldn't have to
 # (pip install wheel doesn't overwrite)
 rm %{buildroot}%{_bindir}/pip
 %else
-%{__python3} setup.py install --skip-build --root %{buildroot}
+%py3_install
 %endif
 %endif # with_python3
 
 %if 0%{?build_wheel}
-pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
+%py2_install_wheel %{python2_wheelname}
 %else
-%{__python} setup.py install -O1 --skip-build --root %{buildroot}
+%py2_install
 %endif
 
 mkdir -p %{buildroot}%{bashcompdir}
@@ -208,19 +194,11 @@ sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips2/" \
 %if 0%{?with_tests}
 %check
 py.test -m 'not network'
-pushd %{py3dir}
 py.test-%{python3_version} -m 'not network'
-popd
 %endif
 
 
-%clean
-%{__rm} -rf %{buildroot}
-
-
 %files -n python2-%{srcname}
-%defattr(-,root,root,-)
-%{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
 %doc README.rst docs
 %attr(755,root,root) %{_bindir}/pip
@@ -235,8 +213,7 @@ popd
 %endif
 
 %if 0%{?with_python3}
-%files -n python3-%{srcname}
-%defattr(-,root,root,-)
+%files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
 %doc README.rst docs
 %attr(755,root,root) %{_bindir}/pip3*
@@ -249,6 +226,11 @@ popd
 %endif # with_python3
 
 %changelog
+* Fri Nov 18 2016 Orion Poplawski <orion@cora.nwra.com> - 8.1.2-5
+- Enable EPEL Python 3 builds
+- Use new python macros
+- Cleanup spec
+
 * Fri Aug 05 2016 Tomas Orsava <torsava@redhat.com> - 8.1.2-4
 - Updated the test sources
 
