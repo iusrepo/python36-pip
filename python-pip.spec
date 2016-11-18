@@ -16,8 +16,8 @@
 %endif
 
 Name:           python-%{srcname}
-Version:        8.1.2
-Release:        5%{?dist}
+Version:        9.0.1
+Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -226,6 +226,9 @@ py.test-%{python3_version} -m 'not network'
 %endif # with_python3
 
 %changelog
+* Fri Nov 18 2016 Orion Poplawski <orion@cora.nwra.com> - 9.0.1-1
+- Update to 9.0.1
+
 * Fri Nov 18 2016 Orion Poplawski <orion@cora.nwra.com> - 8.1.2-5
 - Enable EPEL Python 3 builds
 - Use new python macros

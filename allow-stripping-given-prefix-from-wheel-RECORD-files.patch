@@ -1,24 +1,7 @@
-From 7b3991c99cd8bb9358e109901d4aa8f51269a87a Mon Sep 17 00:00:00 2001
-From: Tomas Orsava <tomas.n@orsava.cz>
-Date: Tue, 17 May 2016 16:40:37 +0200
-Subject: [PATCH] Allow stripping given prefix from wheel RECORD files
-
-Update of a previous patch [0] by Slavek Kabrda <bkabrda@redhat.com>.
-Changes in the pip/wheel.py file in upstream prevented #2 hunk from being
-applied cleanly.
-
-[0] pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
----
- pip/commands/install.py |  9 +++++++++
- pip/req/req_install.py  | 13 +++++++++----
- pip/wheel.py            |  8 ++++++--
- 3 files changed, 24 insertions(+), 6 deletions(-)
-
-diff --git a/pip/commands/install.py b/pip/commands/install.py
-index 7ddde93..e31bd3e 100644
---- a/pip/commands/install.py
-+++ b/pip/commands/install.py
-@@ -137,6 +137,14 @@ class InstallCommand(RequirementCommand):
+diff -up pip-9.0.1/pip/commands/install.py.orig pip-9.0.1/pip/commands/install.py
+--- pip-9.0.1/pip/commands/install.py.orig	2016-11-06 11:49:45.000000000 -0700
++++ pip-9.0.1/pip/commands/install.py	2016-11-16 16:20:48.638906543 -0700
+@@ -151,6 +151,14 @@ class InstallCommand(RequirementCommand)
                   "directory.")
  
          cmd_opts.add_option(
@@ -33,19 +16,18 @@ index 7ddde93..e31bd3e 100644
              '--prefix',
              dest='prefix_path',
              metavar='dir',
-@@ -315,6 +323,7 @@ class InstallCommand(RequirementCommand):
+@@ -340,6 +348,7 @@ class InstallCommand(RequirementCommand)
                              global_options,
                              root=options.root_path,
                              prefix=options.prefix_path,
 +                            strip_file_prefix=options.strip_file_prefix,
                          )
-                         reqs = sorted(
-                             requirement_set.successfully_installed,
-diff --git a/pip/req/req_install.py b/pip/req/req_install.py
-index 9e9fbbb..47f263f 100644
---- a/pip/req/req_install.py
-+++ b/pip/req/req_install.py
-@@ -818,8 +818,7 @@ class InstallRequirement(object):
+ 
+                         possible_lib_locations = get_lib_location_guesses(
+diff -up pip-9.0.1/pip/req/req_install.py.orig pip-9.0.1/pip/req/req_install.py
+--- pip-9.0.1/pip/req/req_install.py.orig	2016-11-06 11:49:45.000000000 -0700
++++ pip-9.0.1/pip/req/req_install.py	2016-11-16 16:19:24.848336960 -0700
+@@ -838,8 +838,7 @@ class InstallRequirement(object):
          else:
              return True
  
@@ -55,7 +37,7 @@ index 9e9fbbb..47f263f 100644
          if self.editable:
              self.install_editable(
                  install_options, global_options, prefix=prefix)
-@@ -828,7 +827,12 @@ class InstallRequirement(object):
+@@ -848,7 +847,12 @@ class InstallRequirement(object):
              version = pip.wheel.wheel_version(self.source_dir)
              pip.wheel.check_compatibility(version, self.name)
  
@@ -69,7 +51,7 @@ index 9e9fbbb..47f263f 100644
              self.install_succeeded = True
              return
  
-@@ -1021,7 +1025,7 @@ class InstallRequirement(object):
+@@ -1053,7 +1057,7 @@ class InstallRequirement(object):
      def is_wheel(self):
          return self.link and self.link.is_wheel
  
@@ -78,7 +60,7 @@ index 9e9fbbb..47f263f 100644
          move_wheel_files(
              self.name, self.req, wheeldir,
              user=self.use_user_site,
-@@ -1030,6 +1034,7 @@ class InstallRequirement(object):
+@@ -1062,6 +1066,7 @@ class InstallRequirement(object):
              prefix=prefix,
              pycompile=self.pycompile,
              isolated=self.isolated,
@@ -86,10 +68,9 @@ index 9e9fbbb..47f263f 100644
          )
  
      def get_dist(self):
-diff --git a/pip/wheel.py b/pip/wheel.py
-index b257d76..6d78ce6 100644
---- a/pip/wheel.py
-+++ b/pip/wheel.py
+diff -up pip-9.0.1/pip/wheel.py.orig pip-9.0.1/pip/wheel.py
+--- pip-9.0.1/pip/wheel.py.orig	2016-11-06 11:49:45.000000000 -0700
++++ pip-9.0.1/pip/wheel.py	2016-11-16 16:19:24.848336960 -0700
 @@ -238,7 +238,7 @@ def get_entrypoints(filename):
  
  
@@ -99,7 +80,7 @@ index b257d76..6d78ce6 100644
      """Install a wheel"""
  
      if not scheme:
-@@ -522,7 +522,11 @@ if __name__ == '__main__':
+@@ -521,7 +521,11 @@ if __name__ == '__main__':
                  writer.writerow(row)
              for f in generated:
                  h, l = rehash(f)
@@ -112,6 +93,3 @@ index b257d76..6d78ce6 100644
              for f in installed:
                  writer.writerow((installed[f], '', ''))
      shutil.move(temp_record, record)
--- 
-2.5.5
-
