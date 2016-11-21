@@ -29,9 +29,9 @@ BuildArch:      noarch
 
 # to get tests:
 # git clone https://github.com/pypa/pip && cd pip
-# git checkout 8.0.2 && tar -czvf pip-8.0.2-tests.tar.gz tests/
+# git checkout 9.0.1 && tar -czvf ../pip-9.0.1-tests.tar.gz tests/
 %if 0%{?with_tests}
-Source1:        pip-8.1.2-tests.tar.gz
+Source1:        pip-9.0.1-tests.tar.gz
 %endif
 
 # Patch until the following issue gets implemented upstream:
