@@ -26,7 +26,6 @@ URL:            http://www.pip-installer.org
 Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # to get tests:
 # git clone https://github.com/pypa/pip && cd pip
