@@ -1,5 +1,5 @@
 %global with_python3 1
-%global build_wheel 0
+%global build_wheel 1
 %global with_tests 0
 
 %global srcname pip
@@ -17,7 +17,7 @@
 
 Name:           python-%{srcname}
 Version:        9.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -225,6 +225,9 @@ py.test-%{python3_version} -m 'not network'
 %endif # with_python3
 
 %changelog
+* Fri Dec 09 2016 Charalampos Stratakis <cstratak@redhat.com> - 9.0.1-3
+- Rebuild for Python 3.6 with wheel
+
 * Fri Dec 09 2016 Charalampos Stratakis <cstratak@redhat.com> - 9.0.1-2
 - Rebuild for Python 3.6 without wheel
 
