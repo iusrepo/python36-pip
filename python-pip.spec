@@ -17,7 +17,7 @@
 
 Name:           python-%{srcname}
 Version:        9.0.1
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -190,6 +190,13 @@ sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips3/" \
 sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips2/" \
     %{buildroot}%{bashcompdir}/pip
 
+# Provide symlinks to executables to comply with Fedora guidelines for Python
+ln -s ./pip%{python2_version} %{buildroot}%{_bindir}/pip-%{python2_version}
+ln -s ./pip%{python3_version} %{buildroot}%{_bindir}/pip-%{python3_version}
+ln -s ./pip-%{python2_version} %{buildroot}%{_bindir}/pip-2
+ln -s ./pip-%{python3_version} %{buildroot}%{_bindir}/pip-3
+
+
 %if 0%{?with_tests}
 %check
 py.test -m 'not network'
@@ -200,8 +207,11 @@ py.test-%{python3_version} -m 'not network'
 %files -n python2-%{srcname}
 %license LICENSE.txt
 %doc README.rst docs
-%attr(755,root,root) %{_bindir}/pip
-%attr(755,root,root) %{_bindir}/pip2*
+%{_bindir}/pip
+%{_bindir}/pip2
+%{_bindir}/pip-2
+%{_bindir}/pip%{python2_version}
+%{_bindir}/pip-%{python2_version}
 %{python_sitelib}/pip*
 %{bashcompdir}
 %if 0%{?with_python3}
@@ -215,7 +225,10 @@ py.test-%{python3_version} -m 'not network'
 %files -n python%{python3_pkgversion}-%{srcname}
 %license LICENSE.txt
 %doc README.rst docs
-%attr(755,root,root) %{_bindir}/pip3*
+%{_bindir}/pip3
+%{_bindir}/pip-3
+%{_bindir}/pip%{python3_version}
+%{_bindir}/pip-%{python3_version}
 %{python3_sitelib}/pip*
 %dir %{bashcompdir}
 %{bashcompdir}/pip3*
@@ -225,6 +238,10 @@ py.test-%{python3_version} -m 'not network'
 %endif # with_python3
 
 %changelog
+* Mon Jan 02 2017 Tomas Orsava <torsava@redhat.com> - 9.0.1-4
+- Provide symlinks to executables to comply with Fedora guidelines for Python
+Resolves: rhbz#1406922
+
 * Fri Dec 09 2016 Charalampos Stratakis <cstratak@redhat.com> - 9.0.1-3
 - Rebuild for Python 3.6 with wheel
 
