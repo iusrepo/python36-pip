@@ -1,42 +1,44 @@
-%global with_python3 1
-%global build_wheel 1
 %global with_tests 0
-
 %global srcname pip
-%if 0%{?build_wheel}
-%global python2_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
-%if 0%{?with_python3}
-%global python3_wheelname %python2_wheelname
-%endif
-%endif
 
 %global bashcompdir %(b=$(pkg-config --variable=completionsdir bash-completion 2>/dev/null); echo ${b:-%{_sysconfdir}/bash_completion.d})
 %if "%{bashcompdir}" != "%{_sysconfdir}/bash_completion.d"
 %global bashcomp2 1
 %endif
 
-Name:           python-%{srcname}
+Name:           python36u-%{srcname}
 Version:        9.0.1
-Release:        4%{?dist}
+Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
 License:        MIT
-URL:            http://www.pip-installer.org
+URL:            https://pip.pypa.io
 Source0:        https://files.pythonhosted.org/packages/source/p/%{srcname}/%{srcname}-%{version}.tar.gz
 
 BuildArch:      noarch
 
 # to get tests:
 # git clone https://github.com/pypa/pip && cd pip
-# git checkout 9.0.1 && tar -czvf ../pip-9.0.1-tests.tar.gz tests/
+# git checkout %%{version} && tar -czvf ../pip-%%{version}-tests.tar.gz tests/
 %if 0%{?with_tests}
-Source1:        pip-9.0.1-tests.tar.gz
+Source1:        pip-%{version}-tests.tar.gz
 %endif
 
-# Patch until the following issue gets implemented upstream:
-# https://github.com/pypa/pip/issues/1351
-Patch0:         allow-stripping-given-prefix-from-wheel-RECORD-files.patch
+BuildRequires:  python36u-devel
+BuildRequires:  python36u-setuptools
+BuildRequires:  bash-completion
+%if 0%{?with_tests}
+BuildRequires:  python36u-mock
+BuildRequires:  python36u-pytest
+BuildRequires:  python36u-pretend
+BuildRequires:  python36u-freezegun
+BuildRequires:  python36u-pytest-capturelog
+BuildRequires:  python36u-scripttest
+BuildRequires:  python36u-virtualenv
+%endif
+Requires:       python36u-setuptools
+
 
 %description
 Pip is a replacement for `easy_install
@@ -45,199 +47,54 @@ same techniques for finding packages, so packages that were made
 easy_installable should be pip-installable as well.
 
 
-%package -n python2-%{srcname}
-Summary:        A tool for installing and managing Python 2 packages
-Group:          Development/Libraries
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-%if 0%{?with_tests}
-BuildRequires:  git
-BuildRequires:  bzr
-BuildRequires:  python-mock
-BuildRequires:  pytest
-BuildRequires:  python-pretend
-BuildRequires:  python-freezegun
-BuildRequires:  python-pytest-capturelog
-BuildRequires:  python-scripttest
-BuildRequires:  python-virtualenv
-%endif
-%if 0%{?build_wheel}
-BuildRequires:  python2-pip
-BuildRequires:  python-wheel
-%endif
-Requires:       python-setuptools
-%{?python_provide:%python_provide python2-%{srcname}}
-
-%description -n python2-%{srcname}
-Pip is a replacement for `easy_install
-<http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
-same techniques for finding packages, so packages that were made
-easy_installable should be pip-installable as well.
-
-
-%if 0%{?with_python3}
-%package -n python%{python3_pkgversion}-%{srcname}
-Summary:        A tool for installing and managing Python3 packages
-Group:          Development/Libraries
-
-BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
-BuildRequires:  bash-completion
-%if 0%{?with_tests}
-BuildRequires:  python%{python3_pkgversion}-mock
-BuildRequires:  python%{python3_pkgversion}-pytest
-BuildRequires:  python%{python3_pkgversion}-pretend
-BuildRequires:  python%{python3_pkgversion}-freezegun
-BuildRequires:  python%{python3_pkgversion}-pytest-capturelog
-BuildRequires:  python%{python3_pkgversion}-scripttest
-BuildRequires:  python%{python3_pkgversion}-virtualenv
-%endif
-%if 0%{?build_wheel}
-BuildRequires:  python%{python3_pkgversion}-pip
-BuildRequires:  python%{python3_pkgversion}-wheel
-%endif
-Requires:  python%{python3_pkgversion}-setuptools
-%{?python_provide:%python_provide python%{python3_pkgversion}-%{srcname}}
-
-%description -n python%{python3_pkgversion}-%{srcname}
-Pip is a replacement for `easy_install
-<http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
-same techniques for finding packages, so packages that were made
-easy_installable should be pip-installable as well.
-%endif # with_python3
-
-
 %prep
 %setup -q -n %{srcname}-%{version}
 %if 0%{?with_tests}
 tar -xf %{SOURCE1}
 %endif
 
-%patch0 -p1
-
-sed -i '1d' pip/__init__.py
+find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
 
 
 %build
-%if 0%{?build_wheel}
-%py2_build_wheel
-%else
-%py2_build
-%endif
-
-%if 0%{?with_python3}
-%if 0%{?build_wheel}
-%py3_build_wheel
-%else
-%py3_build
-%endif
-%endif # with_python3
+%{py36_build}
 
 
 %install
-%if 0%{?with_python3}
-%if 0%{?build_wheel}
-%py3_install_wheel %{python3_wheelname}
-# TODO: we have to remove this by hand now, but it'd be nice if we wouldn't have to
-# (pip install wheel doesn't overwrite)
-rm %{buildroot}%{_bindir}/pip
-%else
-%py3_install
-%endif
-%endif # with_python3
-
-%if 0%{?build_wheel}
-%py2_install_wheel %{python2_wheelname}
-%else
-%py2_install
-%endif
+%{py36_install}
+rm %{buildroot}%{_bindir}/pip{,3}
 
 mkdir -p %{buildroot}%{bashcompdir}
-PYTHONPATH=%{buildroot}%{python_sitelib} \
-    %{buildroot}%{_bindir}/pip completion --bash \
-    > %{buildroot}%{bashcompdir}/pip
-%if 0%{?with_python3}
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    %{buildroot}%{_bindir}/pip3 completion --bash \
-    > %{buildroot}%{bashcompdir}/pip3
-%endif
-pips2=pip
-pips3=pip3
-for pip in %{buildroot}%{_bindir}/pip*; do
-    pip=$(basename $pip)
-    case $pip in
-        pip2*)
-            pips2="$pips2 $pip"
-%if 0%{?bashcomp2}
-            ln -s pip %{buildroot}%{bashcompdir}/$pip
-%endif
-            ;;
-%if 0%{?with_python3}
-        pip3?*)
-            pips3="$pips3 $pip"
-%if 0%{?bashcomp2}
-            ln -s pip3 %{buildroot}%{bashcompdir}/$pip
-%endif
-            ;;
-%endif
-    esac
-done
-%if 0%{?with_python3}
-sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips3/" \
-    -e s/_pip_completion/_pip3_completion/ \
-    %{buildroot}%{bashcompdir}/pip3
-%endif
-sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips2/" \
-    %{buildroot}%{bashcompdir}/pip
-
-# Provide symlinks to executables to comply with Fedora guidelines for Python
-ln -s ./pip%{python2_version} %{buildroot}%{_bindir}/pip-%{python2_version}
-ln -s ./pip%{python3_version} %{buildroot}%{_bindir}/pip-%{python3_version}
-ln -s ./pip-%{python2_version} %{buildroot}%{_bindir}/pip-2
-ln -s ./pip-%{python3_version} %{buildroot}%{_bindir}/pip-3
+PYTHONPATH=%{buildroot}%{python36_sitelib} \
+    %{buildroot}%{_bindir}/pip3.6 completion --bash \
+    > %{buildroot}%{bashcompdir}/pip3.6
+sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip3.6/" \
+    -e s/_pip_completion/_pip36_completion/ \
+    %{buildroot}%{bashcompdir}/pip3.6
 
 
 %if 0%{?with_tests}
 %check
-py.test -m 'not network'
-py.test-%{python3_version} -m 'not network'
+py.test-3.6 -m 'not network'
 %endif
 
 
-%files -n python2-%{srcname}
+%files
 %license LICENSE.txt
 %doc README.rst docs
-%{_bindir}/pip
-%{_bindir}/pip2
-%{_bindir}/pip-2
-%{_bindir}/pip%{python2_version}
-%{_bindir}/pip-%{python2_version}
-%{python_sitelib}/pip*
-%{bashcompdir}
-%if 0%{?with_python3}
-%exclude %{bashcompdir}/pip3*
-%endif
-%if 0%{?bashcomp2}
-%dir %(dirname %{bashcompdir})
-%endif
-
-%if 0%{?with_python3}
-%files -n python%{python3_pkgversion}-%{srcname}
-%license LICENSE.txt
-%doc README.rst docs
-%{_bindir}/pip3
-%{_bindir}/pip-3
-%{_bindir}/pip%{python3_version}
-%{_bindir}/pip-%{python3_version}
-%{python3_sitelib}/pip*
+%{_bindir}/pip3.6
+%{python36_sitelib}/pip*
 %dir %{bashcompdir}
-%{bashcompdir}/pip3*
+%{bashcompdir}/pip3.6
 %if 0%{?bashcomp2}
 %dir %(dirname %{bashcompdir})
 %endif
-%endif # with_python3
+
 
 %changelog
+* Thu Jan 19 2017 Carl George <carl.george@rackspace.com> - 9.0.1-1.ius
+- Port from Fedora to IUS
+
 * Mon Jan 02 2017 Tomas Orsava <torsava@redhat.com> - 9.0.1-4
 - Provide symlinks to executables to comply with Fedora guidelines for Python
 Resolves: rhbz#1406922
