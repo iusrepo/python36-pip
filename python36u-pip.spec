@@ -8,7 +8,7 @@
 
 Name:           python36u-%{srcname}
 Version:        9.0.1
-Release:        1.ius%{?dist}
+Release:        1%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
