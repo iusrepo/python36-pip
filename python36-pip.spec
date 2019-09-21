@@ -6,9 +6,9 @@
 %global bashcomp2 1
 %endif
 
-Name:           python36u-%{srcname}
+Name:           python36-%{srcname}
 Version:        9.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -25,19 +25,23 @@ BuildArch:      noarch
 Source1:        pip-%{version}-tests.tar.gz
 %endif
 
-BuildRequires:  python36u-devel
-BuildRequires:  python36u-setuptools
+BuildRequires:  python36-devel
+BuildRequires:  python36-setuptools
 BuildRequires:  bash-completion
 %if 0%{?with_tests}
-BuildRequires:  python36u-mock
-BuildRequires:  python36u-pytest
-BuildRequires:  python36u-pretend
-BuildRequires:  python36u-freezegun
-BuildRequires:  python36u-pytest-capturelog
-BuildRequires:  python36u-scripttest
-BuildRequires:  python36u-virtualenv
+BuildRequires:  python36-mock
+BuildRequires:  python36-pytest
+BuildRequires:  python36-pretend
+BuildRequires:  python36-freezegun
+BuildRequires:  python36-pytest-capturelog
+BuildRequires:  python36-scripttest
+BuildRequires:  python36-virtualenv
 %endif
-Requires:       python36u-setuptools
+Requires:       python36-setuptools
+
+# Rename from python36u-pip
+Provides: python36u-pip = %{version}-%{release}
+Obsoletes: python36u-pip < 9.0.1-2
 
 
 %description
@@ -92,6 +96,9 @@ py.test-3.6 -m 'not network'
 
 
 %changelog
+* Sat Sep 21 2019 Carl George <carl@george.computer> - 9.0.1-2
+- Rename to python36-pip
+
 * Thu Jan 19 2017 Carl George <carl.george@rackspace.com> - 9.0.1-1.ius
 - Port from Fedora to IUS
 
