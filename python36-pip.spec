@@ -1,6 +1,10 @@
 %global with_tests 0
 %global srcname pip
 
+%if %{defined el6}
+%global __python3 /usr/bin/python3.6
+%endif
+
 Name:           python36-%{srcname}
 Version:        9.0.1
 Release:        2%{?dist}
@@ -55,41 +59,64 @@ find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
 
 
 %build
-%{py36_build}
+%py3_build
 
 
 %install
-%{py36_install}
-rm %{buildroot}%{_bindir}/pip{,3}
+%py3_install
+rm %{buildroot}%{_bindir}/pip
+%if %{defined el6}
+rm %{buildroot}%{_bindir}/pip3
+%endif
 
 mkdir -p %{buildroot}%{bash_completion_dir}
-PYTHONPATH=%{buildroot}%{python36_sitelib} \
-    %{buildroot}%{_bindir}/pip3.6 completion --bash \
-    > %{buildroot}%{bash_completion_dir}/pip3.6
-sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip3.6/" \
-    -e s/_pip_completion/_pip36_completion/ \
-    %{buildroot}%{bash_completion_dir}/pip3.6
+
+%if %{defined el6}
+PYTHONPATH=%{buildroot}%{python3_sitelib} \
+    %{buildroot}%{_bindir}/pip%{python3_version} completion --bash \
+    > %{buildroot}%{bash_completion_dir}/pip3
+mv %{buildroot}%{bash_completion_dir}/pip{3,%{python3_version}}
+sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python3_version}/" \
+    -e s/_pip_completion/_pip%{python3_version_nodots}_completion/ \
+    %{buildroot}%{bash_completion_dir}/pip%{python3_version}
+%else
+PYTHONPATH=%{buildroot}%{python3_sitelib} \
+    %{buildroot}%{_bindir}/pip3 completion --bash \
+    > %{buildroot}%{bash_completion_dir}/pip3
+ln -s pip3 %{buildroot}%{bash_completion_dir}/pip%{python3_version}
+sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip3 pip%{python3_version}/" \
+    -e s/_pip_completion/_pip3_completion/ \
+    %{buildroot}%{bash_completion_dir}/pip3
+%endif
 
 
 %if 0%{?with_tests}
 %check
-py.test-3.6 -m 'not network'
+py.test-%{python3_version} -m 'not network'
 %endif
 
 
 %files
 %license LICENSE.txt
 %doc README.rst docs
-%{_bindir}/pip3.6
-%{python36_sitelib}/pip*
+%if %{undefined el6}
+%{_bindir}/pip3
+%endif
+%{_bindir}/pip%{python3_version}
+%{python3_sitelib}/pip
+%{python3_sitelib}/pip-%{version}-py%{python3_version}.egg-info
 %dir %{_datadir}/bash-completion
 %dir %{bash_completion_dir}
-%{bash_completion_dir}/pip3.6
+%if %{undefined el6}
+%{bash_completion_dir}/pip3
+%endif
+%{bash_completion_dir}/pip%{python3_version}
 
 
 %changelog
 * Sat Sep 21 2019 Carl George <carl@george.computer> - 9.0.1-2
 - Rename to python36-pip
+- Switch to EPEL python3 macros
 
 * Thu Jan 19 2017 Carl George <carl.george@rackspace.com> - 9.0.1-1.ius
 - Port from Fedora to IUS
