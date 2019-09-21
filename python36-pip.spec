@@ -1,11 +1,6 @@
 %global with_tests 0
 %global srcname pip
 
-%global bashcompdir %(b=$(pkg-config --variable=completionsdir bash-completion 2>/dev/null); echo ${b:-%{_sysconfdir}/bash_completion.d})
-%if "%{bashcompdir}" != "%{_sysconfdir}/bash_completion.d"
-%global bashcomp2 1
-%endif
-
 Name:           python36-%{srcname}
 Version:        9.0.1
 Release:        2%{?dist}
@@ -27,7 +22,6 @@ Source1:        pip-%{version}-tests.tar.gz
 
 BuildRequires:  python36-devel
 BuildRequires:  python36-setuptools
-BuildRequires:  bash-completion
 %if 0%{?with_tests}
 BuildRequires:  python36-mock
 BuildRequires:  python36-pytest
@@ -68,13 +62,13 @@ find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
 %{py36_install}
 rm %{buildroot}%{_bindir}/pip{,3}
 
-mkdir -p %{buildroot}%{bashcompdir}
+mkdir -p %{buildroot}%{bash_completion_dir}
 PYTHONPATH=%{buildroot}%{python36_sitelib} \
     %{buildroot}%{_bindir}/pip3.6 completion --bash \
-    > %{buildroot}%{bashcompdir}/pip3.6
+    > %{buildroot}%{bash_completion_dir}/pip3.6
 sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip3.6/" \
     -e s/_pip_completion/_pip36_completion/ \
-    %{buildroot}%{bashcompdir}/pip3.6
+    %{buildroot}%{bash_completion_dir}/pip3.6
 
 
 %if 0%{?with_tests}
@@ -88,11 +82,9 @@ py.test-3.6 -m 'not network'
 %doc README.rst docs
 %{_bindir}/pip3.6
 %{python36_sitelib}/pip*
-%dir %{bashcompdir}
-%{bashcompdir}/pip3.6
-%if 0%{?bashcomp2}
-%dir %(dirname %{bashcompdir})
-%endif
+%dir %{_datadir}/bash-completion
+%dir %{bash_completion_dir}
+%{bash_completion_dir}/pip3.6
 
 
 %changelog
